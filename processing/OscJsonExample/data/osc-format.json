@@ -2,8 +2,8 @@
 	"creator": "processing",
 	"messages": [
 		{
-			"id": "joint_vector",
-			"contents": [
+			"channel": "joint_vector",
+			"arguments": [
 				{
 					"id": "name",
 					"type": "s"
@@ -27,11 +27,11 @@
 			]
 		},
 		{
-			"id": "neckX",
-			"contents": [
+			"channel": "neckX",
+			"arguments": [
 				{
 					"id": "x",
-					"type": "f",
+					"type": "f"
 				}
 			]
 		}
