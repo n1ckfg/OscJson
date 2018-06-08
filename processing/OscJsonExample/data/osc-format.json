@@ -1,0 +1,39 @@
+{
+	"creator": "processing",
+	"messages": [
+		{
+			"id": "joint_vector",
+			"contents": [
+				{
+					"id": "name",
+					"type": "s"
+				},
+				{
+					"id": "index",
+					"type": "i"
+				},
+				{
+					"id": "x",
+					"type": "f"
+				},
+				{
+					"id": "y",
+					"type": "f"
+				},
+				{
+					"id": "z",
+					"type": "f"
+				}
+			]
+		},
+		{
+			"id": "neckX",
+			"contents": [
+				{
+					"id": "x",
+					"type": "f",
+				}
+			]
+		}
+	]
+}
