@@ -2,7 +2,7 @@ import oscP5.*;
 import netP5.*;
 
 String ipNumber = "127.0.0.1";
-int sendPort = 7110;
+int sendPort = 9998;
 int receivePort = 9999;
 OscP5 oscP5;
 NetAddress myRemoteLocation;
@@ -24,6 +24,7 @@ void sendOsc() {
 
 // Receive message example
 void oscEvent(OscMessage msg) {
+  /*
   if (msg.checkAddrPattern("/pos") && msg.checkTypetag("ffi")) {
     println("OSC");
     float x = msg.get(0).floatValue();
@@ -37,6 +38,7 @@ void oscEvent(OscMessage msg) {
     }
   }
   println("eee");
+  */
 }
 
 

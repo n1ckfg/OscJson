@@ -2,28 +2,33 @@
 
 class OscJson {
   
-  ArrayList<OscJsonMsg> receiveMsg;
-  ArrayList<OscJsonMsg> sendMsg;
+  String url = "";
+  ArrayList<OscJsonMsg> msgs;
+  JSONObject json;
+  JSONObject jsonMsg;
+  JSONObject jsonArg;
   
-  OscJson() {
-    receiveMsg = new ArrayList<OscJsonMsg>();
-    sendMsg = new ArrayList<OscJsonMsg>();  
+  OscJson(String _url) {
+    init(_url);
   }
   
-  void loadSendTemplate() {
-    //
-  }
-  
-  void loadReceiveTemplate() {
-    //
-  }
-  
-  void sendOsc() {
-    // 
-  }
-  
-  void receiveOsc() {
-    //
+  void init(String _url) {
+    url = _url;
+    msgs = new ArrayList<OscJsonMsg>();
+    
+    json = loadJSONObject(url);
+    for (int i=0; i<json.getJSONArray("messages").size(); i++) {
+      jsonMsg = (JSONObject) json.getJSONArray("messages").get(i);
+      OscJsonMsg msg = new OscJsonMsg(jsonMsg.getString("channel"));
+      
+      for (int j=0; j<jsonMsg.getJSONArray("arguments").size(); j++) {
+        jsonArg = (JSONObject) jsonMsg.getJSONArray("arguments").get(j);
+        OscJsonArg arg = new OscJsonArg(jsonArg.getString("id"), jsonArg.getString("type"));
+        msg.addArg(arg);
+      }
+      
+      msgs.add(msg);
+    }
   }
   
 }
@@ -34,7 +39,8 @@ class OscJsonMsg {
   String typetag;
   String channel;
   
-  OscJsonMsg() {
+  OscJsonMsg(String _channel) {
+    channel = _channel;
     args = new ArrayList<OscJsonArg>();
     
     // TODO build arg list, assign channel and typetag
@@ -55,20 +61,11 @@ class OscJsonArg {
   //byte[] b;
   
   String type;
+  String id;
   
-  OscJsonArg(String _s) {
-    s = _s;
-    type = "s";
-  }
-  
-  OscJsonArg(int _i) {
-    i = _i;
-    type = "i";
-  }
-  
-  OscJsonArg(float _f) {
-    f = _f;
-    type = "f";
+  OscJsonArg(String _id, String _type) {
+    id = _id;
+    type = _type;
   }
     
 }
