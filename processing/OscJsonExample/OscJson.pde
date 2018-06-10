@@ -20,9 +20,7 @@ void oscSetup() {
 void oscSend() {
   for (int i=0; i<oscJson.msgs.size(); i++) {
     OscJsonMsg msg = oscJson.msgs.get(i);
-    OscMessage myMessage;
-  
-    myMessage = new OscMessage("/" + msg.channel);
+    OscMessage myMessage = new OscMessage("/" + msg.channel);
     for (int j=0; j<msg.args.size(); j++) {
       OscJsonArg arg = msg.args.get(j);
       myMessage.add(arg.id);
@@ -47,6 +45,58 @@ void oscEvent(OscMessage msg) {
 
 // http://opensoundcontrol.org/spec-1_0
 
+class OscParam {
+
+  String id;
+  String type;
+  
+  String s;
+  int i;
+  float f;
+  byte[] b;
+  
+  OscParam(String _id, Object o) {
+    id = _id;
+    setData(o);
+  }
+  
+  void setData(Object o) {
+    if (o instanceof String) {
+      s = (String) o;
+      type = "s";
+    } else if (o instanceof Integer) {
+      i = (int) o;
+      type = "i";
+    } else if (o instanceof Float) {
+      f = (float) o;
+      type = "f";
+    } else if (o instanceof Byte[]) {
+      b = (byte[]) o;
+      type = "b";
+    }
+  }
+  
+  Object getData() {
+    Object returns = null;
+    switch(type) {
+      case("s"):
+        returns = (Object) s;
+        break;
+      case("i"):
+        returns = (Object) i;
+        break;
+      case("f"):
+        returns = (Object) f;
+        break;
+      case("b"):
+        returns = (Object) b;
+        break;
+    }
+    return returns;
+  }
+  
+}
+
 class OscJson {
   
   String url = "";
@@ -58,29 +108,7 @@ class OscJson {
   OscJson(String _url) {
     init(_url);
   }
-  
-  OscJsonMsg getMsg(String _channel) {
-    for (int i=0; i<msgs.size(); i++) {
-       OscJsonMsg msg = msgs.get(i);
-      if (msg.channel == _channel) {
-        return msg;
-      }
-    }
-    return null;
-  }
-  
-  ArrayList<OscJsonArg> getArgs(String _channel) {
-    return getMsg(_channel).args;
-  }
-  
-  boolean getMatch(String _channel, String _typetag) {
-    if (getMsg(_channel).typetag == _typetag) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  
+   
   void init(String _url) {
     url = _url;
     msgs = new ArrayList<OscJsonMsg>();
@@ -92,10 +120,13 @@ class OscJson {
       
       for (int j=0; j<jsonMsg.getJSONArray("arguments").size(); j++) {
         jsonArg = (JSONObject) jsonMsg.getJSONArray("arguments").get(j);
-        OscJsonArg arg = new OscJsonArg(jsonArg.getString("id"), jsonArg.getString("type"));
-        msg.addArg(arg);
+        try {
+          OscJsonArg arg = new OscJsonArg(jsonArg.getString("id"), jsonArg.getString("type"));
+          msg.args.add(arg);
+        } catch (Exception e) { }
       }
       
+      println("channel: " + msg.channel + "   typetag: " + msg.getTypetag());
       msgs.add(msg);
     }
   }
@@ -105,29 +136,24 @@ class OscJson {
 class OscJsonMsg {
   
   ArrayList<OscJsonArg> args;
-  String typetag;
   String channel;
   
   OscJsonMsg(String _channel) {
     channel = _channel;
-    args = new ArrayList<OscJsonArg>();
-    
-    // TODO build arg list, assign channel and typetag
+    args = new ArrayList<OscJsonArg>();    
   }
-  
-  void addArg(OscJsonArg arg) {
-    typetag += arg.type;
-    args.add(arg);
+
+  String getTypetag() {
+    String returns = "";
+    for (int i=0; i<args.size(); i++) {
+      returns += args.get(i).type;
+    }
+    return returns;
   }
-  
+
 }
 
 class OscJsonArg {
-  
-  String s;
-  int i;
-  float f;
-  //byte[] b;
   
   String type;
   String id;
