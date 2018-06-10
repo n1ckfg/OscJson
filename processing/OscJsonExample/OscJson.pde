@@ -1,3 +1,50 @@
+import oscP5.*;
+import netP5.*;
+
+OscJson oscJson;
+String configUrl = "osc-format.json";
+String ipNumber = "127.0.0.1";
+int sendPort = 9998;
+int receivePort = 9999;
+OscP5 oscP5;
+NetAddress myRemoteLocation;
+
+void oscSetup() {
+  oscP5 = new OscP5(this, receivePort);
+  myRemoteLocation = new NetAddress(ipNumber, sendPort);
+
+  oscJson = new OscJson(configUrl);
+}
+
+// Send message example
+void oscSend() {
+  for (int i=0; i<oscJson.msgs.size(); i++) {
+    OscJsonMsg msg = oscJson.msgs.get(i);
+    OscMessage myMessage;
+  
+    myMessage = new OscMessage("/" + msg.channel);
+    for (int j=0; j<msg.args.size(); j++) {
+      OscJsonArg arg = msg.args.get(j);
+      myMessage.add(arg.id);
+    }
+    
+    oscP5.send(myMessage, myRemoteLocation);
+  }
+} 
+
+// Receive message example
+void oscEvent(OscMessage msg) {
+  /*
+  if (msg.checkAddrPattern("/pos") && msg.checkTypetag("ffi")) {
+    float x = msg.get(0).floatValue();
+    float y = msg.get(1).floatValue();
+    int b = msg.get(2).intValue();
+  }
+  */
+}
+
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 // http://opensoundcontrol.org/spec-1_0
 
 class OscJson {
@@ -10,6 +57,28 @@ class OscJson {
   
   OscJson(String _url) {
     init(_url);
+  }
+  
+  OscJsonMsg getMsg(String _channel) {
+    for (int i=0; i<msgs.size(); i++) {
+       OscJsonMsg msg = msgs.get(i);
+      if (msg.channel == _channel) {
+        return msg;
+      }
+    }
+    return null;
+  }
+  
+  ArrayList<OscJsonArg> getArgs(String _channel) {
+    return getMsg(_channel).args;
+  }
+  
+  boolean getMatch(String _channel, String _typetag) {
+    if (getMsg(_channel).typetag == _typetag) {
+      return true;
+    } else {
+      return false;
+    }
   }
   
   void init(String _url) {
